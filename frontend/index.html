@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+   
+
+    <nav>
+    <img class="logo" src="img/logo.png" alt="">
+    
+    <div class="nav-links">
+        <button onclick="mostrarvista('home')">inicio</button>
+        <button onclick="mostrarvista('menu')">menu</button>
+        <button onclick="mostrarvista('cart')">
+        carrito  <span id="cart-count">0</span>
+        </button>
+        <button onclick="mostrarvista('contact')">contacto</button>
+    </div>
+    </nav>
+
+
+    <main>
+        <section id="view-home" class="view active">
+            <h2>bienvenido</h2>
+            <p>bienvenido a la cafeteria</p>
+        </section>
+        <section id="view-menu" class="view">
+            <h2>menu</h2>
+            <p>nuevo productos productivos</p>
+            <div id="products-container" class="products-container"></div>
+        </section>
+        <section id="view-cart" class="view">
+            <h2>carrito</h2>
+            <p>aqui va sus compras</p>
+        </section>
+        
+        <section id="view-contact" class="view">
+    <h2>Contacto</h2>
+
+    <div class="contact-grid">
+
+        <!-- 1️⃣ INFO DEL DUEÑO -->
+        <div class="card info-dueno">
+            <h3>Sobre el dueño</h3>
+            <p><strong>Nombre:</strong> Jhoel Sandoval</p>
+            <p>Apasionado por ofrecer productos de calidad y buena atención al cliente.</p>
+        
+            <p class="frase">
+             “Gracias por elegirnos 😄 si algo sale mal… echamos la culpa al internet 😅”
+            </p>
+        </div>
+
+
+        <!-- 2️⃣ VIDEO -->
+        <div class="card imagen-dueno">
+            <video autoplay muted loop playsinline>
+                <source src="video/emojipreocupado.mp4" type="video/mp4">
+                Tu navegador no soporta video
+            </video>
+        </div>
+
+        <!-- 3️⃣ FORMULARIO -->
+        <div class="card form-card">
+            <h3>Envíanos un mensaje</h3>
+
+            <form id="formContacto">
+                <input type="text" id="nombre" placeholder="Nombre completo" required>
+                <input type="email" id="correo" placeholder="Correo electrónico" required>
+                <textarea id="mensaje" placeholder="Escribe tu mensaje..." required></textarea>
+                <button type="submit">Enviar</button>
+            </form>
+
+        </div>
+
+    </div>
+    </section>
+    </main>
+    
+
+    <footer>
+        <p>elaborado por nigger</p>
+    </footer>
+    
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<script>
+(function(){
+ emailjs.init("15PS0JCpv6Y6Ju8FJ");
+})();
+</script>
+</body>
+</html>
+

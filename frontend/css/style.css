@@ -1,0 +1,450 @@
+/* =========================
+   RESET
+========================= */
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    text-align: center;
+}
+
+
+/* =========================
+   NAVBAR (FIJO)
+========================= */
+nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #1e1e2f;
+    padding: 12px 30px;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Logo */
+.logo {
+    width: 90px;
+}
+
+/* Botones */
+.nav-links {
+    display: flex;
+}
+
+nav button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+nav button:hover {
+    color: #00d4ff;
+}
+
+/* Contador carrito */
+#cart-count {
+    margin-left: 6px;
+    font-weight: bold;
+}
+
+#cart-count.active {
+    background: red;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+main {
+    width: 85%;
+    margin: 40px auto;
+}
+
+
+/* =========================
+   VISTAS
+========================= */
+.view {
+    background: white;
+    padding: 30px;
+    margin: 25px 0;
+    border-radius: 15px;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+
+/* =========================
+   TITULOS
+========================= */
+h2 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1e1e2f;
+}
+
+
+/* =========================
+   PRODUCTOS GRID
+========================= */
+.products-container {
+    margin-top: 24px;
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+
+/* =========================
+   TARJETA PRODUCTO
+========================= */
+.product-card {
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 12px;
+
+    background: #f9f9f9;
+
+    transition: 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Imagen */
+.product-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Precio */
+.product-card span {
+    display: block;
+    margin-top: 10px;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    color: #00c853;
+}
+
+/* Botón comprar */
+.btn-comprar {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+
+    background: #021622;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-comprar:hover {
+    background: #011744;
+}
+
+
+/* =========================
+   CARRITO TABLA
+========================= */
+.cart-header,
+.cart-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+    padding: 12px;
+}
+
+/* Header */
+.cart-header {
+    background: #1e1e2f;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+/* Filas */
+.cart-row {
+    background: white;
+    margin-top: 10px;
+    border-radius: 10px;
+
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.cart-row:hover {
+    transform: translateY(-3px);
+}
+
+
+/* =========================
+   CANTIDAD + -
+========================= */
+.cantidad-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.cantidad-box button {
+    background: #1e1e2f;
+    color: white;
+    border: none;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.cantidad-box button:hover {
+    background: #00c853;
+}
+
+
+/* =========================
+   RESUMEN
+========================= */
+.cart-summary {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    padding: 15px;
+    background: #f4f4f4;
+    border-radius: 10px;
+
+    font-weight: 700;
+}
+
+.cart-summary .total {
+    color: #00c853;
+    font-size: 22px;
+}
+
+
+/* =========================
+   BOTONES ABAJO
+========================= */
+.cart-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Vaciar */
+.btn-vaciar {
+    flex: 1;
+    padding: 12px;
+
+    background: #d32f2f;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-vaciar:hover {
+    background: #b71c1c;
+}
+
+/* Pagar */
+.btn-pagar {
+    flex: 1;
+    padding: 12px;
+
+    background: #00c853;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-pagar:hover {
+    background: #009624;
+}
+
+/* =========================
+   CONTACTO NUEVO PRO
+========================= */
+
+#view-contact {
+    padding: 40px 20px;
+}
+
+/* GRID */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: stretch;
+}
+
+/* TARJETAS GENERALES */
+.card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   INFO DUEÑO (MISMO TAMAÑO QUE VIDEO)
+========================= */
+.info-dueno {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 300px; /* mismo tamaño que video */
+    text-align: left;
+}
+
+.info-dueno h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.info-dueno p {
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.frase {
+    margin-top: 15px;
+    font-style: italic;
+    color: #555;
+}
+
+/* =========================
+   VIDEO (MÁS PEQUEÑO Y CONTROLADO)
+========================= */
+.imagen-dueno {
+    height: 300px; /* 👈 MISMA ALTURA QUE EL TEXTO */
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black; /* opcional */
+}
+
+.imagen-dueno video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 👈 CLAVE */
+}
+
+/* =========================
+   FORMULARIO DESTACADO
+========================= */
+.form-card {
+    grid-column: span 2;
+
+    background: #ffffff;
+    padding: 30px;
+
+    border-radius: 20px;
+
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15); /* MÁS FUERTE */
+    border: 2px solid #00c853; /* RESALTA */
+}
+
+/* TITULO FORM */
+.form-card h3 {
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+/* INPUTS */
+#formContacto input,
+#formContacto textarea {
+    width: 100%;
+    margin: 12px 0;
+    padding: 14px;
+
+    border-radius: 10px;
+    border: 2px solid #ddd;
+
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+/* FOCUS */
+#formContacto input:focus,
+#formContacto textarea:focus {
+    border-color: #00c853;
+    box-shadow: 0 0 6px rgba(0,200,83,0.3);
+}
+
+/* BOTÓN */
+#formContacto button {
+    width: 100%;
+    background: #00c853;
+    color: white;
+
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+
+    font-weight: bold;
+    font-size: 15px;
+
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* HOVER */
+#formContacto button:hover {
+    background: #009624;
+    transform: scale(1.02);
+}
+
+
+
+/* =========================
+   FOOTER
+========================= */
+footer {
+    background: #1e1e2f;
+    color: white;
+    padding: 15px;
+    margin-top: 40px;
+}
