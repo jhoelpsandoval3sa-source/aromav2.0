@@ -105,20 +105,19 @@ function renderizarCarrito() {
     let html = "<h2>Carrito</h2>";
 
     if (carrito.length === 0) {
-    html += "<p>Tu carrito está vacío</p>";
+        html += "<p>Tu carrito está vacío</p>";
 
-    // 👇 AGREGA ESTO
-    html += `
-    <div class="cart-actions">
-        <button class="btn-vaciar" onclick="vaciarCarrito()">
-            Vaciar carrito
-        </button>
+        html += `
+        <div class="cart-actions">
+            <button class="btn-vaciar" onclick="vaciarCarrito()">
+                Vaciar carrito
+            </button>
 
-        <button class="btn-pagar" onclick="pagar()">
-            Pagar por WhatsApp
-        </button>
-    </div>
-    `;
+            <button class="btn-pagar" onclick="pagar()">
+                Pagar por WhatsApp
+            </button>
+        </div>
+        `;
     } else {
 
         let total = 0;
@@ -227,18 +226,20 @@ function pagar() {
 
     mensaje += `%0A💰 *Total: Bs ${total}*`;
 
-    const numero = "59164916803"; // 👈 CAMBIA ESTO
+    const numero = "59164916803";
 
     const url = `https://wa.me/${numero}?text=${mensaje}`;
     window.open(url, "_blank");
 
-    // limpiar carrito
     carrito = [];
     renderizarCarrito();
     actualizarContador();
 }
 
 
+// =========================
+// FORMULARIO CONTACTO
+// =========================
 document.addEventListener("DOMContentLoaded", function(){
 
     const form = document.getElementById("formContacto");
@@ -254,13 +255,11 @@ document.addEventListener("DOMContentLoaded", function(){
 
         limpiarErrores();
 
-        // Validar nombre
         if(nombre.value.trim() === ""){
             mostrarError(nombre, "El nombre es obligatorio");
             valido = false;
         }
 
-        // Validar email
         if(correo.value.trim() === ""){
             mostrarError(correo, "El correo es obligatorio");
             valido = false;
@@ -269,7 +268,6 @@ document.addEventListener("DOMContentLoaded", function(){
             valido = false;
         }
 
-        // Validar mensaje
         if(mensaje.value.trim() === ""){
             mostrarError(mensaje, "El mensaje no puede estar vacío");
             valido = false;
@@ -277,7 +275,6 @@ document.addEventListener("DOMContentLoaded", function(){
 
         if(!valido) return;
 
-        // Enviar
         emailjs.send("service_4r0zhsb", "template_0now3v8", {
             name: nombre.value,
             email: correo.value,
@@ -285,11 +282,8 @@ document.addEventListener("DOMContentLoaded", function(){
         })
         .then(function() {
             alert("Mensaje enviado ✅");
-
-            // 🔥 LIMPIAR TODO
-            form.reset();          // limpia inputs
-            limpiarErrores();     // elimina mensajes y bordes rojos
-
+            form.reset();
+            limpiarErrores();
         })
         .catch(function(error) {
             console.log(error);
@@ -320,11 +314,12 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 
 
+renderizarCarrito();
 
 
 // =========================
 // INICIO
 // =========================
-renderizarproducto();
+cargarProductos();
 renderizarCarrito();
 actualizarContador();

@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script src="js/app.js" defer></script>
+    <script src="js/supabase-cliente.js"></script>
 </head>
 <body>
    
@@ -14,8 +16,8 @@
     <img class="logo" src="img/logo.png" alt="">
     
     <div class="nav-links">
-        <button onclick="mostrarvista('home')">inicio</button>
-        <button onclick="mostrarvista('menu')">menu</button>
+        <button onclick="mostrarvista('home')"> inicio </button>
+        <button onclick="mostrarvista('menu')"> menu </button>
         <button onclick="mostrarvista('cart')">
         carrito  <span id="cart-count">0</span>
         </button>
@@ -87,6 +89,7 @@
     </footer>
     
 
+
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
@@ -94,6 +97,7 @@
  emailjs.init("15PS0JCpv6Y6Ju8FJ");
 })();
 </script>
+    <link rel="stylesheet" href="css/style.css">
 </body>
 </html>
 
