@@ -320,6 +320,8 @@ renderizarCarrito();
 // =========================
 // INICIO
 // =========================
-cargarProductos();
-renderizarCarrito();
-actualizarContador();
+document.addEventListener("DOMContentLoaded", function() {
+    renderizarproducto();     // ← Aquí estaba el error
+    renderizarCarrito();
+    actualizarContador();
+});

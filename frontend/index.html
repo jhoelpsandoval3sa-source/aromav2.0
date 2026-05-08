@@ -1,103 +1,158 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- META -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <script src="js/app.js" defer></script>
-    <script src="js/supabase-cliente.js"></script>
-</head>
-<body>
-   
 
+    <!-- TITULO -->
+    <title>Cafetería Jhoel</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- LIBRERIAS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+    <!-- JS -->
+    <script src="js/supabase-cliente.js"></script>
+    <script src="js/app.js" defer></script>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
     <nav>
-    <img class="logo" src="img/logo.png" alt="">
-    
-    <div class="nav-links">
-        <button onclick="mostrarvista('home')"> inicio </button>
-        <button onclick="mostrarvista('menu')"> menu </button>
-        <button onclick="mostrarvista('cart')">
-        carrito  <span id="cart-count">0</span>
-        </button>
-        <button onclick="mostrarvista('contact')">contacto</button>
-    </div>
+        <img class="logo" src="img/logo.png" alt="Logo Cafetería">
+
+        <div class="nav-links">
+            <button type="button" onclick="mostrarvista('home')">Inicio</button>
+            <button type="button" onclick="mostrarvista('menu')">Menú</button>
+
+            <button type="button" onclick="mostrarvista('cart')">
+                Carrito <span id="cart-count">0</span>
+            </button>
+
+            <button type="button" onclick="mostrarvista('contact')">Contacto</button>
+        </div>
     </nav>
 
 
+    <!-- CONTENIDO -->
     <main>
+
+        <!-- INICIO -->
         <section id="view-home" class="view active">
-            <h2>bienvenido</h2>
-            <p>bienvenido a la cafeteria</p>
+            <h2>Bienvenido</h2>
+            <p>Bienvenido a nuestra cafetería ☕</p>
         </section>
+
+
+        <!-- MENU -->
         <section id="view-menu" class="view">
-            <h2>menu</h2>
-            <p>nuevo productos productivos</p>
+            <h2>Menú</h2>
+            <p>Descubre nuestros productos</p>
+
             <div id="products-container" class="products-container"></div>
         </section>
+
+
+        <!-- CARRITO -->
         <section id="view-cart" class="view">
-            <h2>carrito</h2>
-            <p>aqui va sus compras</p>
+            <h2>Carrito</h2>
+            <p>Aquí aparecerán tus compras</p>
         </section>
-        
+
+
+        <!-- CONTACTO -->
         <section id="view-contact" class="view">
-    <h2>Contacto</h2>
 
-    <div class="contact-grid">
+            <h2>Contacto</h2>
 
-        <!-- 1️⃣ INFO DEL DUEÑO -->
-        <div class="card info-dueno">
-            <h3>Sobre el dueño</h3>
-            <p><strong>Nombre:</strong> Jhoel Sandoval</p>
-            <p>Apasionado por ofrecer productos de calidad y buena atención al cliente.</p>
-        
-            <p class="frase">
-             “Gracias por elegirnos 😄 si algo sale mal… echamos la culpa al internet 😅”
-            </p>
-        </div>
+            <div class="contact-grid">
+
+                <!-- INFORMACION -->
+                <div class="card info-dueno">
+                    <h3>Sobre el dueño</h3>
+
+                    <p><strong>Nombre:</strong> Jhoel Sandoval</p>
+
+                    <p>
+                        Apasionado por ofrecer productos de calidad
+                        y excelente atención al cliente.
+                    </p>
+
+                    <p class="frase">
+                        “Gracias por elegirnos 😄”
+                    </p>
+                </div>
 
 
-        <!-- 2️⃣ VIDEO -->
-        <div class="card imagen-dueno">
-            <video autoplay muted loop playsinline>
-                <source src="video/emojipreocupado.mp4" type="video/mp4">
-                Tu navegador no soporta video
-            </video>
-        </div>
+                <!-- VIDEO -->
+                <div class="card imagen-dueno">
+                    <video autoplay muted loop playsinline>
+                        <source src="video/emojipreocupado.mp4" type="video/mp4">
+                        Tu navegador no soporta video.
+                    </video>
+                </div>
 
-        <!-- 3️⃣ FORMULARIO -->
-        <div class="card form-card">
-            <h3>Envíanos un mensaje</h3>
 
-            <form id="formContacto">
-                <input type="text" id="nombre" placeholder="Nombre completo" required>
-                <input type="email" id="correo" placeholder="Correo electrónico" required>
-                <textarea id="mensaje" placeholder="Escribe tu mensaje..." required></textarea>
-                <button type="submit">Enviar</button>
-            </form>
+                <!-- FORMULARIO -->
+                <div class="card form-card">
 
-        </div>
+                    <h3>Envíanos un mensaje</h3>
 
-    </div>
-    </section>
+                    <form id="formContacto">
+
+                        <input
+                            type="text"
+                            id="nombre"
+                            placeholder="Nombre completo"
+                            required
+                        >
+
+                        <input
+                            type="email"
+                            id="correo"
+                            placeholder="Correo electrónico"
+                            required
+                        >
+
+                        <textarea
+                            id="mensaje"
+                            placeholder="Escribe tu mensaje..."
+                            required
+                        ></textarea>
+
+                        <button type="submit">
+                            Enviar
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </main>
-    
 
+
+    <!-- FOOTER -->
     <footer>
-        <p>elaborado por nigger</p>
+        <p>Elaborado por Jhoel Sandoval © 2026</p>
     </footer>
-    
 
 
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <!-- EMAILJS -->
+    <script>
+        (function () {
+            emailjs.init("15PS0JCpv6Y6Ju8FJ");
+        })();
+    </script>
 
-<script>
-(function(){
- emailjs.init("15PS0JCpv6Y6Ju8FJ");
-})();
-</script>
-    <link rel="stylesheet" href="css/style.css">
 </body>
 </html>
-
+```
