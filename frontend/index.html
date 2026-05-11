@@ -27,6 +27,9 @@
         <img class="logo" src="img/logo.png" alt="Logo Cafetería">
 
         <div class="nav-links">
+            <button type="button" onclick="mostrarvista('registro')">
+            Registro
+            </button>
             <button type="button" onclick="mostrarvista('home')">Inicio</button>
             <button type="button" onclick="mostrarvista('menu')">Menú</button>
 
@@ -41,6 +44,24 @@
 
     <!-- CONTENIDO -->
     <main>
+
+        <section id="view-registro" class="view">
+
+    <h2>Crear Cuenta</h2>
+
+    <form id="registroForm" class="form-card">
+
+    <input type="text" id="regNombre" placeholder="Nombre completo" required>
+
+    <input type="email" id="regCorreo" placeholder="Correo" required>
+
+    <input type="password" id="regPassword" placeholder="Contraseña" required>
+
+    <button type="submit">Registrarme</button>
+
+    </form>
+
+    </section>
 
         <!-- INICIO -->
         <section id="view-home" class="view active">

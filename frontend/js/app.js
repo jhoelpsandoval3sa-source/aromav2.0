@@ -2,6 +2,7 @@
 // CAMBIO DE VISTAS
 // =========================
 function mostrarvista(vista){
+    document.getElementById("view-registro").classList.remove("active");
     document.getElementById("view-home").classList.remove("active");
     document.getElementById("view-menu").classList.remove("active");
     document.getElementById("view-cart").classList.remove("active");
@@ -9,6 +10,51 @@ function mostrarvista(vista){
 
     document.getElementById("view-" + vista).classList.add("active");
 }
+
+
+
+
+document.addEventListener("DOMContentLoaded", function(){
+
+const formRegistro = document.getElementById("registroForm");
+
+if(formRegistro){
+
+formRegistro.addEventListener("submit", async function(e){
+e.preventDefault();
+
+const nombre = document.getElementById("regNombre").value;
+const correo = document.getElementById("regCorreo").value;
+const password = document.getElementById("regPassword").value;
+
+const { data, error } = await db.auth.signUp({
+email: correo,
+password: password,
+options:{
+data:{
+nombre:nombre
+}
+}
+});
+
+if(error){
+alert("❌ " + error.message);
+}else{
+alert("✅ Cuenta creada correctamente");
+formRegistro.reset();
+mostrarvista("home");
+}
+
+});
+
+}
+
+});
+
+
+
+
+
 
 
 // =========================
