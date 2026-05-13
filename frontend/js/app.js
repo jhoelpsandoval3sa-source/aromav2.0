@@ -1,248 +1,347 @@
+// ======================================
+// app.js ORDENADO - CAFETERIA JHOEL
+// ======================================
+
 // =========================
 // CAMBIO DE VISTAS
 // =========================
-function mostrarvista(vista){
-    document.getElementById("view-registro").classList.remove("active");
-    document.getElementById("view-home").classList.remove("active");
-    document.getElementById("view-menu").classList.remove("active");
-    document.getElementById("view-cart").classList.remove("active");
-    document.getElementById("view-contact").classList.remove("active");
+function mostrarvista(vista) {
+    document.querySelectorAll(".view").forEach(sec => {
+        sec.classList.remove("active");
+    });
 
     document.getElementById("view-" + vista).classList.add("active");
 }
 
-
-
-
-document.addEventListener("DOMContentLoaded", function(){
-
-const formRegistro = document.getElementById("registroForm");
-
-if(formRegistro){
-
-formRegistro.addEventListener("submit", async function(e){
-e.preventDefault();
-
-const nombre = document.getElementById("regNombre").value;
-const correo = document.getElementById("regCorreo").value;
-const password = document.getElementById("regPassword").value;
-
-const { data, error } = await db.auth.signUp({
-email: correo,
-password: password,
-options:{
-data:{
-nombre:nombre
-}
-}
-});
-
-if(error){
-alert("❌ " + error.message);
-}else{
-alert("✅ Cuenta creada correctamente");
-formRegistro.reset();
-mostrarvista("home");
-}
-
-});
-
-}
-
-});
-
-
-
-
-
-
-
 // =========================
-// PRODUCTOS
+// VARIABLES GLOBALES
 // =========================
-const productos = [
-    { id:1, nombre:"cafe", descripcion:"cafe clasico", precio:12, imagen:"img/cafe.jpg" },
-    { id:2, nombre:"brownie", descripcion:"masa de chocolate", precio:8, imagen:"img/brownie.jpg" },
-    { id:3, nombre:"capuccino", descripcion:"expreso con leche", precio:18, imagen:"img/capuccino.jpg" },
-    { id:4, nombre:"cuernito", descripcion:"masa con queso", precio:10, imagen:"img/cuernito.jpg" },
-    { id:5, nombre:"empanada", descripcion:"relleno con queso", precio:7, imagen:"img/empanada.jpg" },
-    { id:6, nombre:"helado", descripcion:"artesanal", precio:15, imagen:"img/helado.jpg" },
-    { id:7, nombre:"donas", descripcion:"glaseado chocolate", precio:8, imagen:"img/donas.jpg" },
-    { id:8, nombre:"pastel", descripcion:"con crema y frutas", precio:12, imagen:"img/pastel.jpg" }
-];
-
+let productos = [];
 let carrito = [];
 
+// =========================
+// INICIAR PAGINA
+// =========================
+document.addEventListener("DOMContentLoaded", async () => {
+
+    // revisar sesión
+    const { data } = await db.auth.getSession();
+
+    if (data.session) {
+        entrarSistema();
+    } else {
+        mostrarvista("home"); // invitado
+    }
+
+    // recordar correo
+    const correo = localStorage.getItem("correo");
+
+    if (correo && document.getElementById("loginCorreo")) {
+        loginCorreo.value = correo;
+        loginCorreo.readOnly = true;
+    }
+
+    await cargarProductos();
+
+    renderizarCarrito();
+    actualizarContador();
+
+    iniciarLogin();
+    iniciarRegistro();
+    iniciarContacto();
+});
+
+// =========================
+// LOGIN
+// =========================
+function iniciarLogin() {
+
+    const form = document.getElementById("loginForm");
+    if (!form) return;
+
+    form.addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const email = loginCorreo.value;
+        const password = loginPassword.value;
+
+        const { error } = await db.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) {
+            alert("Correo o contraseña incorrectos");
+            return;
+        }
+
+        localStorage.setItem("correo", email);
+
+        entrarSistema();
+    });
+}
+
+// =========================
+// REGISTRO
+// =========================
+function iniciarRegistro() {
+
+    const form = document.getElementById("registroForm");
+    if (!form) return;
+
+    form.addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const nombre = regNombre.value;
+        const correo = regCorreo.value;
+        const password = regPassword.value;
+
+        const { error } = await db.auth.signUp({
+            email: correo,
+            password: password,
+            options: {
+                data: {
+                    nombre: nombre
+                }
+            }
+        });
+
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
+        localStorage.setItem("correo", correo);
+
+        alert("Cuenta creada correctamente");
+
+        form.reset();
+
+        mostrarvista("login");
+    });
+}
+
+// =========================
+// ENTRAR SISTEMA
+// =========================
+async function entrarSistema() {
+
+    document.querySelector("nav").style.display = "flex";
+
+    mostrarvista("home");
+}
+
+// =========================
+// CERRAR SESION
+// =========================
+async function cerrarSesion() {
+    await db.auth.signOut();
+    location.reload();
+}
+
+// =========================
+// OTRA CUENTA
+// =========================
+function usarOtraCuenta() {
+    localStorage.removeItem("correo");
+
+    loginCorreo.readOnly = false;
+    loginCorreo.value = "";
+}
+
+// =========================
+// CARGAR PRODUCTOS SUPABASE
+// =========================
+async function cargarProductos() {
+
+    const { data, error } = await db
+        .from("products")
+        .select("*")
+        .eq("disponible", true);
+
+    if (error) {
+        console.log(error);
+        return;
+    }
+
+    productos = data;
+
+    renderizarproducto();
+}
 
 // =========================
 // RENDER PRODUCTOS
 // =========================
 function renderizarproducto() {
+
     const contenedor = document.getElementById("products-container");
+
     let html = "";
 
     productos.forEach(p => {
+
         html += `
         <div class="product-card">
+
             <h3>${p.nombre}</h3>
+
             <img src="${p.imagen}" alt="${p.nombre}">
+
+            <p>${p.descripcion}</p>
+
             <span>Bs ${p.precio}</span>
 
-            <button class="btn-comprar" onclick="comprar(${p.id})">
+            <button onclick="comprar(${p.id})">
                 Comprar
             </button>
-        </div>`;
+
+        </div>
+        `;
     });
 
     contenedor.innerHTML = html;
 }
 
-
 // =========================
-// AGREGAR AL CARRITO
+// COMPRAR
 // =========================
 function comprar(id) {
+
     const producto = productos.find(p => p.id === id);
+
     const existe = carrito.find(p => p.id === id);
 
     if (existe) {
         existe.cantidad++;
     } else {
-        carrito.push({ ...producto, cantidad: 1 });
+        carrito.push({
+            ...producto,
+            cantidad: 1
+        });
     }
 
     renderizarCarrito();
     actualizarContador();
 }
 
-
 // =========================
-// AUMENTAR / DISMINUIR
-// =========================
-function aumentarCantidad(id) {
-    const p = carrito.find(p => p.id === id);
-    if (p) p.cantidad++;
-
-    renderizarCarrito();
-    actualizarContador();
-}
-
-function disminuirCantidad(id) {
-    const p = carrito.find(p => p.id === id);
-
-    if (p) {
-        p.cantidad--;
-        if (p.cantidad <= 0) {
-            carrito = carrito.filter(x => x.id !== id);
-        }
-    }
-
-    renderizarCarrito();
-    actualizarContador();
-}
-
-
-// =========================
-// RENDER CARRITO
+// CARRITO
 // =========================
 function renderizarCarrito() {
-    const contenedor = document.getElementById("view-cart");
 
-    let html = "<h2>Carrito</h2>";
+const contenedor = document.getElementById("view-cart");
 
-    if (carrito.length === 0) {
-        html += "<p>Tu carrito está vacío</p>";
+let html = "<h2>Carrito</h2>";
 
-        html += `
-        <div class="cart-actions">
-            <button class="btn-vaciar" onclick="vaciarCarrito()">
-                Vaciar carrito
-            </button>
+if (carrito.length === 0) {
 
-            <button class="btn-pagar" onclick="pagar()">
-                Pagar por WhatsApp
-            </button>
-        </div>
-        `;
-    } else {
+html += "<p>Tu carrito está vacío</p>";
 
-        let total = 0;
-        let totalCantidad = 0;
+} else {
 
-        html += `
-        <div class="cart-table">
-            <div class="cart-header">
-                <span>Producto</span>
-                <span>Descripción</span>
-                <span>Precio</span>
-                <span>Cantidad</span>
-            </div>
-        `;
+let total = 0;
+let totalCantidad = 0;
 
-        carrito.forEach(p => {
-            const subtotal = p.precio * p.cantidad;
-            total += subtotal;
-            totalCantidad += p.cantidad;
+html += `
+<div class="cart-header">
+<span>Producto</span>
+<span>Precio</span>
+<span>Cantidad</span>
+<span>Subtotal</span>
+</div>
+`;
 
-            html += `
-            <div class="cart-row">
-                <span>${p.nombre}</span>
-                <span>${p.descripcion}</span>
-                <span>Bs ${subtotal}</span>
+carrito.forEach(p => {
 
-                <div class="cantidad-box">
-                    <button onclick="disminuirCantidad(${p.id})">−</button>
-                    <span>${p.cantidad}</span>
-                    <button onclick="aumentarCantidad(${p.id})">+</button>
-                </div>
-            </div>`;
-        });
+const subtotal = p.precio * p.cantidad;
+total += subtotal;
+totalCantidad += p.cantidad;
 
-        html += `</div>`;
+html += `
+<div class="cart-row">
 
-        html += `
-        <div class="cart-summary">
-            <div>Total productos: ${totalCantidad}</div>
-            <div class="total">Bs ${total}</div>
-        </div>
+<span>${p.nombre}</span>
 
-        <div class="cart-actions">
-            <button class="btn-vaciar" onclick="vaciarCarrito()">
-                Vaciar carrito
-            </button>
+<span>Bs ${p.precio}</span>
 
-            <button class="btn-pagar" onclick="pagar()">
-                Pagar por WhatsApp
-            </button>
-        </div>
-        `;
-    }
+<div class="cantidad-box">
+<button onclick="disminuirCantidad(${p.id})">−</button>
+<span>${p.cantidad}</span>
+<button onclick="aumentarCantidad(${p.id})">+</button>
+</div>
 
-    contenedor.innerHTML = html;
+<span>Bs ${subtotal}</span>
+
+</div>
+`;
+});
+
+html += `
+<div class="cart-summary">
+<div>Total productos: ${totalCantidad}</div>
+<div class="total">Bs ${total}</div>
+</div>
+
+<div class="cart-actions">
+<button class="btn-vaciar" onclick="vaciarCarrito()">
+Vaciar carrito
+</button>
+
+<button class="btn-pagar" onclick="pagar()">
+Pagar por WhatsApp
+</button>
+</div>
+`;
+}
+
+contenedor.innerHTML = html;
 }
 
 
+function aumentarCantidad(id){
+
+const producto = carrito.find(p => p.id === id);
+
+if(producto){
+producto.cantidad++;
+}
+
+renderizarCarrito();
+actualizarContador();
+}
+
+function disminuirCantidad(id){
+
+const producto = carrito.find(p => p.id === id);
+
+if(producto){
+
+producto.cantidad--;
+
+if(producto.cantidad <= 0){
+carrito = carrito.filter(p => p.id !== id);
+}
+
+}
+
+renderizarCarrito();
+actualizarContador();
+}
+
 // =========================
-// CONTADOR NAV
+// CONTADOR
 // =========================
 function actualizarContador() {
-    const contador = document.getElementById("cart-count");
 
     let total = 0;
+
     carrito.forEach(p => total += p.cantidad);
 
-    contador.textContent = total;
-
-    if (total > 0) {
-        contador.classList.add("active");
-    } else {
-        contador.classList.remove("active");
-    }
+    cart-count.textContent === total;
 }
 
-
 // =========================
-// VACIAR CARRITO
+// VACIAR
 // =========================
 function vaciarCarrito() {
     carrito = [];
@@ -250,124 +349,59 @@ function vaciarCarrito() {
     actualizarContador();
 }
 
-
 // =========================
-// PAGAR POR WHATSAPP
+// PAGAR
 // =========================
 function pagar() {
+
     if (carrito.length === 0) {
-        alert("Tu carrito está vacío");
+        alert("Carrito vacío");
         return;
     }
 
-    let mensaje = "🛒 *Pedido Cafetería*%0A%0A";
+    let mensaje = "🛒 Pedido Cafetería %0A%0A";
+
     let total = 0;
 
     carrito.forEach(p => {
+
         const subtotal = p.precio * p.cantidad;
+
         total += subtotal;
 
-        mensaje += `• ${p.nombre} x${p.cantidad} = Bs ${subtotal}%0A`;
+        mensaje += `${p.nombre} x${p.cantidad} = Bs ${subtotal}%0A`;
     });
 
-    mensaje += `%0A💰 *Total: Bs ${total}*`;
+    mensaje += `%0ATotal: Bs ${total}`;
 
-    const numero = "59164916803";
-
-    const url = `https://wa.me/${numero}?text=${mensaje}`;
-    window.open(url, "_blank");
-
-    carrito = [];
-    renderizarCarrito();
-    actualizarContador();
+    window.open(
+        `https://wa.me/59164916803?text=${mensaje}`,
+        "_blank"
+    );
 }
 
-
 // =========================
-// FORMULARIO CONTACTO
+// CONTACTO
 // =========================
-document.addEventListener("DOMContentLoaded", function(){
+function iniciarContacto() {
 
     const form = document.getElementById("formContacto");
+    if (!form) return;
 
-    form.addEventListener("submit", function(e){
+    form.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        let nombre = document.getElementById("nombre");
-        let correo = document.getElementById("correo");
-        let mensaje = document.getElementById("mensaje");
-
-        let valido = true;
-
-        limpiarErrores();
-
-        if(nombre.value.trim() === ""){
-            mostrarError(nombre, "El nombre es obligatorio");
-            valido = false;
-        }
-
-        if(correo.value.trim() === ""){
-            mostrarError(correo, "El correo es obligatorio");
-            valido = false;
-        } else if(!validarEmail(correo.value)){
-            mostrarError(correo, "Correo inválido");
-            valido = false;
-        }
-
-        if(mensaje.value.trim() === ""){
-            mostrarError(mensaje, "El mensaje no puede estar vacío");
-            valido = false;
-        }
-
-        if(!valido) return;
-
-        emailjs.send("service_4r0zhsb", "template_0now3v8", {
-            name: nombre.value,
-            email: correo.value,
-            message: mensaje.value
-        })
-        .then(function() {
-            alert("Mensaje enviado ✅");
+        emailjs.send(
+            "service_4r0zhsb",
+            "template_0now3v8",
+            {
+                name: nombre.value,
+                email: correo.value,
+                message: mensaje.value
+            }
+        ).then(() => {
+            alert("Mensaje enviado");
             form.reset();
-            limpiarErrores();
-        })
-        .catch(function(error) {
-            console.log(error);
-            alert("Error ❌");
         });
-
     });
-
-    function validarEmail(email){
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function mostrarError(input, mensaje){
-        input.classList.add("error");
-
-        let small = document.createElement("small");
-        small.classList.add("mensaje-error");
-        small.innerText = mensaje;
-
-        input.parentNode.appendChild(small);
-    }
-
-    function limpiarErrores(){
-        document.querySelectorAll(".error").forEach(el => el.classList.remove("error"));
-        document.querySelectorAll(".mensaje-error").forEach(el => el.remove());
-    }
-
-});
-
-
-renderizarCarrito();
-
-
-// =========================
-// INICIO
-// =========================
-document.addEventListener("DOMContentLoaded", function() {
-    renderizarproducto();     // ← Aquí estaba el error
-    renderizarCarrito();
-    actualizarContador();
-});
+}

@@ -45,23 +45,46 @@
     <!-- CONTENIDO -->
     <main>
 
+        <section id="view-login" class="view">
+
+        <h2>Iniciar Sesión</h2>
+
+        <form id="loginForm" class="form-card">
+        
+        <input type="email" id="loginCorreo" placeholder="Correo" required>
+        
+        <input type="password" id="loginPassword" placeholder="Contraseña" required>
+        
+        <button type="submit">Entrar</button>
+        
+        <p onclick="usarOtraCuenta()" style="cursor:pointer;">
+        Usar otra cuenta
+        </p>
+
+        <p onclick="mostrarvista('registro')" style="cursor:pointer;">
+        ¿No tienes cuenta? Regístrate
+        </p>
+
+        </form>
+
+        </section>
         <section id="view-registro" class="view">
 
-    <h2>Crear Cuenta</h2>
-
-    <form id="registroForm" class="form-card">
-
-    <input type="text" id="regNombre" placeholder="Nombre completo" required>
-
-    <input type="email" id="regCorreo" placeholder="Correo" required>
-
-    <input type="password" id="regPassword" placeholder="Contraseña" required>
-
-    <button type="submit">Registrarme</button>
-
-    </form>
-
-    </section>
+        <h2>Crear Cuenta</h2>
+                
+        <form id="registroForm" class="form-card">
+        
+        <input type="text" id="regNombre" placeholder="Nombre completo" required>
+        
+        <input type="email" id="regCorreo" placeholder="Correo" required>
+        
+        <input type="password" id="regPassword" placeholder="Contraseña" required>
+        
+        <button type="submit">Registrarme</button>
+        
+        </form>
+        
+        </section>
 
         <!-- INICIO -->
         <section id="view-home" class="view active">
@@ -160,6 +183,8 @@
 
     </main>
 
+    
+
 
     <!-- FOOTER -->
     <footer>
@@ -176,4 +201,4 @@
 
 </body>
 </html>
-```
+ 
