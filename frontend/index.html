@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <!-- META -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,96 +20,175 @@
     <!-- JS -->
     <script src="js/supabase-cliente.js"></script>
     <script src="js/app.js" defer></script>
+
 </head>
 
 <body>
 
     <!-- NAVBAR -->
     <nav>
-        <img class="logo" src="img/logo.png" alt="Logo Cafetería">
 
-        <div class="nav-links">
-            <button type="button" onclick="mostrarvista('registro')">
+    <img class="logo" src="img/logo.png" alt="Logo">
+
+    <div class="nav-links">
+
+        <button onclick="mostrarvista('home')">Inicio</button>
+
+        <button onclick="mostrarvista('menu')">Menú</button>
+
+        <button onclick="mostrarvista('cart')">
+            Carrito <span id="cart-count">0</span>
+        </button>
+
+        <button onclick="mostrarvista('contact')">
+            Contacto
+        </button>
+
+        <button id="btn-login" onclick="mostrarvista('login')">
+            Iniciar Sesión
+        </button>
+
+        <button id="btn-registro" onclick="mostrarvista('registro')">
             Registro
-            </button>
-            <button type="button" onclick="mostrarvista('home')">Inicio</button>
-            <button type="button" onclick="mostrarvista('menu')">Menú</button>
+        </button>
 
-            <button type="button" onclick="mostrarvista('cart')">
-                Carrito <span id="cart-count">0</span>
-            </button>
+        <button
+            id="btn-cerrar"
+            onclick="cerrarSesion()"
+            style="display:none;"
+        >
+            Cerrar Sesión
+        </button>
 
-            <button type="button" onclick="mostrarvista('contact')">Contacto</button>
-        </div>
-    </nav>
+        <!-- ESTADO -->
+        <p id="estado-usuario">
+            No has iniciado sesión
+        </p>
 
+    </div>
+
+</nav>
 
     <!-- CONTENIDO -->
     <main>
 
+        <!-- LOGIN -->
         <section id="view-login" class="view">
 
-        <h2>Iniciar Sesión</h2>
+            <h2>Iniciar Sesión</h2>
 
-        <form id="loginForm" class="form-card">
-        
-        <input type="email" id="loginCorreo" placeholder="Correo" required>
-        
-        <input type="password" id="loginPassword" placeholder="Contraseña" required>
-        
-        <button type="submit">Entrar</button>
-        
-        <p onclick="usarOtraCuenta()" style="cursor:pointer;">
-        Usar otra cuenta
-        </p>
+            <form id="loginForm" class="form-card">
 
-        <p onclick="mostrarvista('registro')" style="cursor:pointer;">
-        ¿No tienes cuenta? Regístrate
-        </p>
+                <input
+                    type="email"
+                    id="loginCorreo"
+                    placeholder="Correo"
+                    required
+                >
 
-        </form>
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Contraseña"
+                    required
+                >
+
+                <button type="submit">
+                    Entrar
+                </button>
+
+                <p
+                    onclick="usarOtraCuenta()"
+                    style="cursor:pointer;"
+                >
+                    Usar otra cuenta
+                </p>
+
+                <p
+                    onclick="mostrarvista('registro')"
+                    style="cursor:pointer;"
+                >
+                    ¿No tienes cuenta? Regístrate
+                </p>
+
+            </form>
 
         </section>
+
+        <!-- REGISTRO -->
         <section id="view-registro" class="view">
 
-        <h2>Crear Cuenta</h2>
-                
-        <form id="registroForm" class="form-card">
-        
-        <input type="text" id="regNombre" placeholder="Nombre completo" required>
-        
-        <input type="email" id="regCorreo" placeholder="Correo" required>
-        
-        <input type="password" id="regPassword" placeholder="Contraseña" required>
-        
-        <button type="submit">Registrarme</button>
-        
-        </form>
-        
+            <h2>Crear Cuenta</h2>
+
+            <form id="registroForm" class="form-card">
+
+                <input
+                    type="text"
+                    id="regNombre"
+                    placeholder="Nombre completo"
+                    required
+                >
+
+                <input
+                    type="email"
+                    id="regCorreo"
+                    placeholder="Correo"
+                    required
+                >
+
+                <input
+                    type="password"
+                    id="regPassword"
+                    placeholder="Contraseña"
+                    required
+                >
+
+                <button type="submit">
+                    Registrarme
+                </button>
+
+            </form>
+
         </section>
 
-        <!-- INICIO -->
+        <!-- HOME -->
         <section id="view-home" class="view active">
-            <h2>Bienvenido</h2>
-            <p>Bienvenido a nuestra cafetería ☕</p>
-        </section>
 
+            <h2>Bienvenido</h2>
+
+            <p>
+                Bienvenido a nuestra cafetería ☕
+            </p>
+
+        </section>
 
         <!-- MENU -->
         <section id="view-menu" class="view">
+
             <h2>Menú</h2>
-            <p>Descubre nuestros productos</p>
 
-            <div id="products-container" class="products-container"></div>
+            <p>
+                Descubre nuestros productos
+            </p>
+
+            <div
+                id="products-container"
+                class="products-container"
+            ></div>
+
         </section>
-
 
         <!-- CARRITO -->
         <section id="view-cart" class="view">
-            <h2>Carrito</h2>
-            <p>Aquí aparecerán tus compras</p>
-        </section>
 
+    <div id="cart-items"></div>
+
+</section>
+
+            <!-- CORREGIDO -->
+            <div id="cart-items"></div>
+
+        </section>
 
         <!-- CONTACTO -->
         <section id="view-contact" class="view">
@@ -116,11 +197,15 @@
 
             <div class="contact-grid">
 
-                <!-- INFORMACION -->
+                <!-- INFORMACIÓN -->
                 <div class="card info-dueno">
+
                     <h3>Sobre el dueño</h3>
 
-                    <p><strong>Nombre:</strong> Jhoel Sandoval</p>
+                    <p>
+                        <strong>Nombre:</strong>
+                        Jhoel Sandoval
+                    </p>
 
                     <p>
                         Apasionado por ofrecer productos de calidad
@@ -130,17 +215,24 @@
                     <p class="frase">
                         “Gracias por elegirnos 😄”
                     </p>
-                </div>
 
+                </div>
 
                 <!-- VIDEO -->
                 <div class="card imagen-dueno">
-                    <video autoplay muted loop playsinline>
-                        <source src="video/emojipreocupado.mp4" type="video/mp4">
-                        Tu navegador no soporta video.
-                    </video>
-                </div>
 
+                    <video autoplay muted loop playsinline>
+
+                        <source
+                            src="video/emojipreocupado.mp4"
+                            type="video/mp4"
+                        >
+
+                        Tu navegador no soporta video.
+
+                    </video>
+
+                </div>
 
                 <!-- FORMULARIO -->
                 <div class="card form-card">
@@ -183,22 +275,26 @@
 
     </main>
 
-    
-
-
     <!-- FOOTER -->
     <footer>
-        <p>Elaborado por Jhoel Sandoval © 2026</p>
-    </footer>
 
+        <p>
+            Elaborado por Jhoel Sandoval © 2026
+        </p>
+
+    </footer>
 
     <!-- EMAILJS -->
     <script>
+
         (function () {
+
             emailjs.init("15PS0JCpv6Y6Ju8FJ");
+
         })();
+
     </script>
 
 </body>
+
 </html>
- 

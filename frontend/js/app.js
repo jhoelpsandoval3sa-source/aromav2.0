@@ -1,84 +1,361 @@
 // ======================================
-// app.js ORDENADO - CAFETERIA JHOEL
+// app.js - CAFETERÍA JHOEL COMPLETO
 // ======================================
 
 // =========================
-// CAMBIO DE VISTAS
+// VALIDAR SUPABASE
 // =========================
-function mostrarvista(vista) {
-    document.querySelectorAll(".view").forEach(sec => {
-        sec.classList.remove("active");
-    });
+if (typeof db === "undefined") {
 
-    document.getElementById("view-" + vista).classList.add("active");
+    alert("❌ Error conectando con Supabase");
+
+    throw new Error("Supabase no inicializado");
 }
 
 // =========================
 // VARIABLES GLOBALES
 // =========================
 let productos = [];
+
 let carrito = [];
 
-// =========================
-// INICIAR PAGINA
-// =========================
-document.addEventListener("DOMContentLoaded", async () => {
+let usuarioActual = null;
 
-    // revisar sesión
-    const { data } = await db.auth.getSession();
+// =========================
+// ESCAPAR HTML
+// =========================
+function escaparHTML(texto) {
 
-    if (data.session) {
-        entrarSistema();
+    const div = document.createElement("div");
+
+    div.textContent = texto || "";
+
+    return div.innerHTML;
+}
+
+// =========================
+// GUARDAR CARRITO
+// =========================
+function guardarCarrito() {
+
+    localStorage.setItem(
+        "carrito",
+        JSON.stringify(carrito)
+    );
+}
+
+// =========================
+// CARGAR CARRITO
+// =========================
+function cargarCarritoGuardado() {
+
+    const carritoGuardado =
+        localStorage.getItem("carrito");
+
+    if (carritoGuardado) {
+
+        try {
+
+            carrito = JSON.parse(carritoGuardado);
+
+        } catch (err) {
+
+            carrito = [];
+        }
+    }
+}
+
+// =========================
+// INICIO
+// =========================
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        try {
+
+            // =========================
+            // VERIFICAR SESIÓN
+            // =========================
+            const {
+                data: { session }
+            } = await db.auth.getSession();
+
+            if (session) {
+
+                usuarioActual = session.user;
+
+                console.log(
+                    "✅ Usuario:",
+                    usuarioActual.email
+                );
+
+                entrarSistema();
+
+            } else {
+
+                console.log(
+                    "❌ Sin sesión"
+                );
+
+                mostrarvista("home");
+            }
+
+            // =========================
+            // ESTADO USUARIO
+            // =========================
+            await actualizarEstadoUsuario();
+
+            // =========================
+            // RECORDAR CORREO
+            // =========================
+            const loginCorreo =
+                document.getElementById(
+                    "loginCorreo"
+                );
+
+            if (loginCorreo) {
+
+                const correo =
+                    localStorage.getItem(
+                        "correo"
+                    );
+
+                if (correo) {
+
+                    loginCorreo.value = correo;
+
+                    loginCorreo.readOnly = true;
+                }
+            }
+
+            // =========================
+            // CARGAR CARRITO
+            // =========================
+            cargarCarritoGuardado();
+
+            // =========================
+            // PRODUCTOS
+            // =========================
+            await cargarProductos();
+
+            // =========================
+            // RENDER
+            // =========================
+            renderizarCarrito();
+
+            actualizarContador();
+
+            // =========================
+            // FUNCIONES
+            // =========================
+            iniciarLogin();
+
+            iniciarRegistro();
+
+            iniciarContacto();
+
+        } catch (err) {
+
+            console.error(
+                "❌ Error:",
+                err
+            );
+        }
+    }
+);
+
+// =========================
+// CAMBIAR VISTA
+// =========================
+function mostrarvista(vista) {
+
+    document
+        .querySelectorAll(".view")
+        .forEach(sec => {
+
+            sec.classList.remove(
+                "active"
+            );
+        });
+
+    const vistaElement =
+        document.getElementById(
+            "view-" + vista
+        );
+
+    if (vistaElement) {
+
+        vistaElement.classList.add(
+            "active"
+        );
+    }
+}
+
+// =========================
+// ESTADO USUARIO
+// =========================
+async function actualizarEstadoUsuario() {
+
+    const estado =
+        document.getElementById(
+            "estado-usuario"
+        );
+
+    const btnLogin =
+        document.getElementById(
+            "btn-login"
+        );
+
+    const btnRegistro =
+        document.getElementById(
+            "btn-registro"
+        );
+
+    const btnCerrar =
+        document.getElementById(
+            "btn-cerrar"
+        );
+
+    if (!estado) return;
+
+    const {
+        data: { user }
+    } = await db.auth.getUser();
+
+    if (user) {
+
+        estado.innerHTML = `
+            ✅ ${user.email}
+        `;
+
+        if (btnLogin) {
+            btnLogin.style.display =
+                "none";
+        }
+
+        if (btnRegistro) {
+            btnRegistro.style.display =
+                "none";
+        }
+
+        if (btnCerrar) {
+            btnCerrar.style.display =
+                "inline-block";
+        }
+
     } else {
-        mostrarvista("home"); // invitado
+
+        estado.innerHTML =
+            "❌ No has iniciado sesión";
+
+        if (btnLogin) {
+            btnLogin.style.display =
+                "inline-block";
+        }
+
+        if (btnRegistro) {
+            btnRegistro.style.display =
+                "inline-block";
+        }
+
+        if (btnCerrar) {
+            btnCerrar.style.display =
+                "none";
+        }
     }
-
-    // recordar correo
-    const correo = localStorage.getItem("correo");
-
-    if (correo && document.getElementById("loginCorreo")) {
-        loginCorreo.value = correo;
-        loginCorreo.readOnly = true;
-    }
-
-    await cargarProductos();
-
-    renderizarCarrito();
-    actualizarContador();
-
-    iniciarLogin();
-    iniciarRegistro();
-    iniciarContacto();
-});
+}
 
 // =========================
 // LOGIN
 // =========================
 function iniciarLogin() {
 
-    const form = document.getElementById("loginForm");
+    const form =
+        document.getElementById(
+            "loginForm"
+        );
+
     if (!form) return;
 
-    form.addEventListener("submit", async e => {
-        e.preventDefault();
+    form.addEventListener(
+        "submit",
+        async e => {
 
-        const email = loginCorreo.value;
-        const password = loginPassword.value;
+            e.preventDefault();
 
-        const { error } = await db.auth.signInWithPassword({
-            email,
-            password
-        });
+            const email =
+                document
+                .getElementById(
+                    "loginCorreo"
+                )
+                .value.trim();
 
-        if (error) {
-            alert("Correo o contraseña incorrectos");
-            return;
+            const password =
+                document
+                .getElementById(
+                    "loginPassword"
+                )
+                .value;
+
+            if (!email || !password) {
+
+                alert(
+                    "Completa los campos"
+                );
+
+                return;
+            }
+
+            try {
+
+                const {
+                    data,
+                    error
+                } =
+                await db.auth
+                    .signInWithPassword({
+
+                        email,
+
+                        password
+                    });
+
+                if (error) {
+
+                    alert(
+                        "❌ Correo o contraseña incorrectos"
+                    );
+
+                    return;
+                }
+
+                usuarioActual =
+                    data.user;
+
+                localStorage.setItem(
+                    "correo",
+                    email
+                );
+
+                await actualizarEstadoUsuario();
+
+                entrarSistema();
+
+                alert(
+                    "✅ Sesión iniciada"
+                );
+
+            } catch (err) {
+
+                console.error(err);
+
+                alert(
+                    "Error iniciando sesión"
+                );
+            }
         }
-
-        localStorage.setItem("correo", email);
-
-        entrarSistema();
-    });
+    );
 }
 
 // =========================
@@ -86,95 +363,200 @@ function iniciarLogin() {
 // =========================
 function iniciarRegistro() {
 
-    const form = document.getElementById("registroForm");
+    const form =
+        document.getElementById(
+            "registroForm"
+        );
+
     if (!form) return;
 
-    form.addEventListener("submit", async e => {
-        e.preventDefault();
+    form.addEventListener(
+        "submit",
+        async e => {
 
-        const nombre = regNombre.value;
-        const correo = regCorreo.value;
-        const password = regPassword.value;
+            e.preventDefault();
 
-        const { error } = await db.auth.signUp({
-            email: correo,
-            password: password,
-            options: {
-                data: {
-                    nombre: nombre
-                }
+            const nombre =
+                document
+                .getElementById(
+                    "regNombre"
+                )
+                .value.trim();
+
+            const correo =
+                document
+                .getElementById(
+                    "regCorreo"
+                )
+                .value.trim();
+
+            const password =
+                document
+                .getElementById(
+                    "regPassword"
+                )
+                .value;
+
+            if (
+                !nombre ||
+                !correo ||
+                !password
+            ) {
+
+                alert(
+                    "Completa todos los campos"
+                );
+
+                return;
             }
-        });
 
-        if (error) {
-            alert(error.message);
-            return;
+            try {
+
+                const {
+                    error
+                } =
+                await db.auth.signUp({
+
+                    email: correo,
+
+                    password: password,
+
+                    options: {
+
+                        data: {
+
+                            nombre: nombre
+                        }
+                    }
+                });
+
+                if (error) {
+
+                    alert(
+                        "❌ " +
+                        error.message
+                    );
+
+                    return;
+                }
+
+                alert(
+                    "✅ Cuenta creada"
+                );
+
+                form.reset();
+
+                mostrarvista(
+                    "login"
+                );
+
+            } catch (err) {
+
+                console.error(err);
+
+                alert(
+                    "Error registrando"
+                );
+            }
         }
-
-        localStorage.setItem("correo", correo);
-
-        alert("Cuenta creada correctamente");
-
-        form.reset();
-
-        mostrarvista("login");
-    });
+    );
 }
 
 // =========================
 // ENTRAR SISTEMA
 // =========================
-async function entrarSistema() {
+function entrarSistema() {
 
-    document.querySelector("nav").style.display = "flex";
+    const nav =
+        document.querySelector("nav");
+
+    if (nav) {
+
+        nav.style.display =
+            "flex";
+    }
 
     mostrarvista("home");
 }
 
 // =========================
-// CERRAR SESION
+// CERRAR SESIÓN
 // =========================
 async function cerrarSesion() {
+
     await db.auth.signOut();
+
+    usuarioActual = null;
+
+    carrito = [];
+
+    guardarCarrito();
+
+    localStorage.removeItem(
+        "correo"
+    );
+
+    await actualizarEstadoUsuario();
+
+    alert(
+        "✅ Sesión cerrada"
+    );
+
     location.reload();
 }
 
 // =========================
-// OTRA CUENTA
-// =========================
-function usarOtraCuenta() {
-    localStorage.removeItem("correo");
-
-    loginCorreo.readOnly = false;
-    loginCorreo.value = "";
-}
-
-// =========================
-// CARGAR PRODUCTOS SUPABASE
+// PRODUCTOS
 // =========================
 async function cargarProductos() {
 
-    const { data, error } = await db
-        .from("products")
-        .select("*")
-        .eq("disponible", true);
+    try {
 
-    if (error) {
-        console.log(error);
-        return;
+        const {
+            data,
+            error
+        } = await db
+            .from("products")
+            .select("*")
+            .eq(
+                "disponible",
+                true
+            )
+            .order(
+                "id",
+                {
+                    ascending: true
+                }
+            );
+
+        if (error) {
+
+            console.error(error);
+
+            return;
+        }
+
+        productos = data || [];
+
+        renderizarProductos();
+
+    } catch (err) {
+
+        console.error(err);
     }
-
-    productos = data;
-
-    renderizarproducto();
 }
 
 // =========================
 // RENDER PRODUCTOS
 // =========================
-function renderizarproducto() {
+function renderizarProductos() {
 
-    const contenedor = document.getElementById("products-container");
+    const contenedor =
+        document.getElementById(
+            "products-container"
+        );
+
+    if (!contenedor) return;
 
     let html = "";
 
@@ -183,16 +565,39 @@ function renderizarproducto() {
         html += `
         <div class="product-card">
 
-            <h3>${p.nombre}</h3>
+            <h3>
+                ${escaparHTML(
+                    p.nombre
+                )}
+            </h3>
 
-            <img src="${p.imagen}" alt="${p.nombre}">
+            <img
+                src="${
+                    p.imagen ||
+                    "img/default.jpg"
+                }"
+                alt="${escaparHTML(
+                    p.nombre
+                )}"
+            >
 
-            <p>${p.descripcion}</p>
+            <p>
+                ${escaparHTML(
+                    p.descripcion
+                )}
+            </p>
 
-            <span>Bs ${p.precio}</span>
+            <span class="precio">
+                Bs ${Number(
+                    p.precio
+                ).toFixed(2)}
+            </span>
 
-            <button onclick="comprar(${p.id})">
-                Comprar
+            <button
+                class="btn-comprar"
+                onclick="comprar(${p.id})"
+            >
+                Agregar al carrito
             </button>
 
         </div>
@@ -207,125 +612,193 @@ function renderizarproducto() {
 // =========================
 function comprar(id) {
 
-    const producto = productos.find(p => p.id === id);
+    if (!usuarioActual) {
 
-    const existe = carrito.find(p => p.id === id);
+        alert(
+            "⚠️ Debes iniciar sesión"
+        );
+
+        mostrarvista("login");
+
+        return;
+    }
+
+    const producto =
+        productos.find(
+            p => p.id === id
+        );
+
+    if (!producto) return;
+
+    const existe =
+        carrito.find(
+            p => p.id === id
+        );
 
     if (existe) {
+
         existe.cantidad++;
+
     } else {
+
         carrito.push({
+
             ...producto,
+
             cantidad: 1
         });
     }
 
+    guardarCarrito();
+
     renderizarCarrito();
+
+    actualizarContador();
+
+    alert(
+        "✅ Producto agregado"
+    );
+}
+
+// =========================
+// RENDER CARRITO
+// =========================
+function renderizarCarrito() {
+
+    const contenedor =
+        document.getElementById(
+            "cart-items"
+        );
+
+    if (!contenedor) return;
+
+    let html = "";
+
+    if (carrito.length === 0) {
+
+        html = `
+            <h2>🛒 Carrito</h2>
+            <p>Vacío</p>
+        `;
+
+    } else {
+
+        let total = 0;
+
+        html += `
+            <h2>🛒 Carrito</h2>
+        `;
+
+        carrito.forEach(p => {
+
+            const subtotal =
+                p.precio *
+                p.cantidad;
+
+            total += subtotal;
+
+            html += `
+            <div class="cart-row">
+
+                <span>
+                    ${p.nombre}
+                </span>
+
+                <span>
+                    Bs ${subtotal}
+                </span>
+
+                <button
+                    onclick="disminuirCantidad(${p.id})"
+                >
+                    -
+                </button>
+
+                <span>
+                    ${p.cantidad}
+                </span>
+
+                <button
+                    onclick="aumentarCantidad(${p.id})"
+                >
+                    +
+                </button>
+
+            </div>
+            `;
+        });
+
+        html += `
+        <h3>
+            Total: Bs ${total}
+        </h3>
+
+        <button
+            onclick="vaciarCarrito()"
+        >
+            Vaciar carrito
+        </button>
+
+        <button
+            onclick="pagar()"
+        >
+            Pagar
+        </button>
+        `;
+    }
+
+    contenedor.innerHTML = html;
+}
+
+// =========================
+// AUMENTAR
+// =========================
+function aumentarCantidad(id) {
+
+    const producto =
+        carrito.find(
+            x => x.id === id
+        );
+
+    if (producto) {
+
+        producto.cantidad++;
+    }
+
+    guardarCarrito();
+
+    renderizarCarrito();
+
     actualizarContador();
 }
 
 // =========================
-// CARRITO
+// DISMINUIR
 // =========================
-function renderizarCarrito() {
+function disminuirCantidad(id) {
 
-const contenedor = document.getElementById("view-cart");
+    const producto =
+        carrito.find(
+            x => x.id === id
+        );
 
-let html = "<h2>Carrito</h2>";
+    if (!producto) return;
 
-if (carrito.length === 0) {
+    producto.cantidad--;
 
-html += "<p>Tu carrito está vacío</p>";
+    if (producto.cantidad <= 0) {
 
-} else {
+        carrito =
+            carrito.filter(
+                x => x.id !== id
+            );
+    }
 
-let total = 0;
-let totalCantidad = 0;
+    guardarCarrito();
 
-html += `
-<div class="cart-header">
-<span>Producto</span>
-<span>Precio</span>
-<span>Cantidad</span>
-<span>Subtotal</span>
-</div>
-`;
+    renderizarCarrito();
 
-carrito.forEach(p => {
-
-const subtotal = p.precio * p.cantidad;
-total += subtotal;
-totalCantidad += p.cantidad;
-
-html += `
-<div class="cart-row">
-
-<span>${p.nombre}</span>
-
-<span>Bs ${p.precio}</span>
-
-<div class="cantidad-box">
-<button onclick="disminuirCantidad(${p.id})">−</button>
-<span>${p.cantidad}</span>
-<button onclick="aumentarCantidad(${p.id})">+</button>
-</div>
-
-<span>Bs ${subtotal}</span>
-
-</div>
-`;
-});
-
-html += `
-<div class="cart-summary">
-<div>Total productos: ${totalCantidad}</div>
-<div class="total">Bs ${total}</div>
-</div>
-
-<div class="cart-actions">
-<button class="btn-vaciar" onclick="vaciarCarrito()">
-Vaciar carrito
-</button>
-
-<button class="btn-pagar" onclick="pagar()">
-Pagar por WhatsApp
-</button>
-</div>
-`;
-}
-
-contenedor.innerHTML = html;
-}
-
-
-function aumentarCantidad(id){
-
-const producto = carrito.find(p => p.id === id);
-
-if(producto){
-producto.cantidad++;
-}
-
-renderizarCarrito();
-actualizarContador();
-}
-
-function disminuirCantidad(id){
-
-const producto = carrito.find(p => p.id === id);
-
-if(producto){
-
-producto.cantidad--;
-
-if(producto.cantidad <= 0){
-carrito = carrito.filter(p => p.id !== id);
-}
-
-}
-
-renderizarCarrito();
-actualizarContador();
+    actualizarContador();
 }
 
 // =========================
@@ -335,73 +808,265 @@ function actualizarContador() {
 
     let total = 0;
 
-    carrito.forEach(p => total += p.cantidad);
+    carrito.forEach(p => {
 
-    cart-count.textContent === total;
+        total += p.cantidad;
+    });
+
+    const contador =
+        document.getElementById(
+            "cart-count"
+        );
+
+    if (contador) {
+
+        contador.textContent =
+            total;
+    }
 }
 
 // =========================
 // VACIAR
 // =========================
 function vaciarCarrito() {
+
     carrito = [];
+
+    guardarCarrito();
+
     renderizarCarrito();
+
     actualizarContador();
 }
 
 // =========================
 // PAGAR
 // =========================
-function pagar() {
+async function pagar() {
 
     if (carrito.length === 0) {
+
         alert("Carrito vacío");
+
         return;
     }
 
-    let mensaje = "🛒 Pedido Cafetería %0A%0A";
+    try {
 
-    let total = 0;
+        const {
+            data: { user }
+        } = await db.auth.getUser();
 
-    carrito.forEach(p => {
+        if (!user) {
 
-        const subtotal = p.precio * p.cantidad;
+            alert(
+                "Inicia sesión"
+            );
 
-        total += subtotal;
+            return;
+        }
 
-        mensaje += `${p.nombre} x${p.cantidad} = Bs ${subtotal}%0A`;
-    });
+        let total = 0;
 
-    mensaje += `%0ATotal: Bs ${total}`;
+        carrito.forEach(item => {
 
-    window.open(
-        `https://wa.me/59164916803?text=${mensaje}`,
-        "_blank"
-    );
+            total +=
+                item.precio *
+                item.cantidad;
+        });
+
+        // =========================
+        // CREAR PEDIDO
+        // =========================
+        const {
+            data: pedido,
+            error: pedidoError
+        } = await db
+            .from("orders")
+            .insert([
+                {
+                    user_id:
+                        user.id,
+
+                    total:
+                        total,
+
+                    estado:
+                        "pendiente"
+                }
+            ])
+            .select()
+            .single();
+
+        if (pedidoError) {
+
+            console.error(
+                pedidoError
+            );
+
+            alert(
+                pedidoError.message
+            );
+
+            return;
+        }
+
+        // =========================
+        // ITEMS
+        // =========================
+        const productosPedido =
+            carrito.map(producto => ({
+
+                order_id:
+                    pedido.id,
+
+                product_id:
+                    producto.id,
+
+                cantidad:
+                    producto.cantidad,
+
+                precio_unit:
+                    producto.precio
+            }));
+
+        const {
+            error: itemsError
+        } = await db
+            .from("order_items")
+            .insert(
+                productosPedido
+            );
+
+        if (itemsError) {
+
+            console.error(
+                itemsError
+            );
+
+            alert(
+                itemsError.message
+            );
+
+            return;
+        }
+
+        // =========================
+        // WHATSAPP
+        // =========================
+        const mensaje =
+            encodeURIComponent(`
+
+🛒 NUEVO PEDIDO
+
+Pedido #${pedido.id}
+
+${carrito.map(i => `
+${i.nombre}
+x${i.cantidad}
+= Bs ${i.precio * i.cantidad}
+`).join("\n")}
+
+TOTAL: Bs ${total}
+
+`);
+
+        window.open(
+            `https://wa.me/59164916803?text=${mensaje}`,
+            "_blank"
+        );
+
+        vaciarCarrito();
+
+        alert(
+            `✅ Pedido #${pedido.id} guardado`
+        );
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert(
+            "Error procesando pedido"
+        );
+    }
 }
 
 // =========================
-// CONTACTO
+// CONTACTO EMAILJS
 // =========================
 function iniciarContacto() {
 
-    const form = document.getElementById("formContacto");
+    const form =
+        document.getElementById(
+            "formContacto"
+        );
+
     if (!form) return;
 
-    form.addEventListener("submit", function (e) {
-        e.preventDefault();
+    form.addEventListener(
+        "submit",
+        async function (e) {
 
-        emailjs.send(
-            "service_4r0zhsb",
-            "template_0now3v8",
-            {
-                name: nombre.value,
-                email: correo.value,
-                message: mensaje.value
+            e.preventDefault();
+
+            const nombre =
+                document
+                .getElementById(
+                    "nombre"
+                )
+                .value.trim();
+
+            const correo =
+                document
+                .getElementById(
+                    "correo"
+                )
+                .value.trim();
+
+            const mensaje =
+                document
+                .getElementById(
+                    "mensaje"
+                )
+                .value.trim();
+
+            try {
+
+                await emailjs.send(
+
+                    "service_4r0zhsb",
+
+                    "template_0now3v8",
+
+                    {
+                        from_name:
+                            nombre,
+
+                        from_email:
+                            correo,
+
+                        message:
+                            mensaje
+                    }
+                );
+
+                alert(
+                    "✅ Mensaje enviado"
+                );
+
+                form.reset();
+
+            } catch (error) {
+
+                console.error(
+                    error
+                );
+
+                alert(
+                    "❌ Error enviando mensaje"
+                );
             }
-        ).then(() => {
-            alert("Mensaje enviado");
-            form.reset();
-        });
-    });
+        }
+    );
 }
